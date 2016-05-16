@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Math Challenge sketch1</title>
+	<style type="text/css">
+	body {
+		font-family: monospace;
+		margin: 0;
+		padding: 0;
+	}
+	
+	#game {
+		text-align: center;
+		width: 300px;
+		margin: 20px auto;
+		border: 3px solid black;
+	}
+	
+	h1 { margin: 0px; }
+	
+	#prompt {
+		width: 50%;
+		border: 2px solid black;
+		margin-left: auto;
+		margin-right: auto;
+	}
+	
+	#question {
+		font-size: x-large;
+	}
+	
+	/* Firefox and Chrome messed with my answer box spacing
+	 * found "box-sizing" solution here:
+	 *   http://stackoverflow.com/questions/18582606/
+	 */
+	#answer {
+		display: block;
+		width: 100%;
+		box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		border: 1px solid grey;
+		padding-left: 2px;
+	}
+	
+	/* timer ripped from css-tricks.com/css3-progress-bars/ */
+	#timer {
+		height: 20px;
+		position: relative;
+	}
+	
+	/* for transition information, I consulted:
+	 *	css-tricks.com/almanac/properties/t/transition/,
+	 * 	easings.net
+	 */
+	#timer > span {
+		display: block;
+		height: 100%;
+		background-color: red;
+		position: relative;
+		overflow: hidden;
+		transition: width 50ms ease-out-back;
+	}
+	
+	#scoreboard > span {
+		transition: background-color 500ms ease-out;
+	}
+	
+	#scoreboard > #fail.bumped {
+		transition: none;
+		background-color: red;
+	}
+	
+	#scoreboard > #pass.bumped {
+		transition: none;
+		background-color: green;
+	}
+	</style>
+</head>
+<body>
+<!-- 
+Enter Math Challenge!
+
+It's time for me to actually do something I said I was going to do. 
+Math Challenge should be a simple step forward from Typing Challenge, 
+though I intend to restructure and rewrite the basic form somewhat. 
+In Typing Challenge, you have a typing prompt and a text input as your 
+primary loop controls, and your total number of correct responses and 
+your average response time as your score (all feedback to the player). 
+In Math Challenge, I'm going to play with the loop controls a little 
+bit. The player will also be able to fail problems and be forced to 
+move on. The player can fail questions by submitting wrong answers or 
+timing out.
+ -->
+<div id="game">
+	<h1>TYPE THE ANSWER</h1>
+	<div id="prompt">
+		<div id="question">2+2</div>
+		<input type="text" id="answer" value="4" onfocus="begin();" onblur="pause()">
+		<div id="timer"><span style="width: 100%"></span></div>
+	</div>
+	<div id="scoreboard">
+		<span id="fail">0</span> FAIL / <span id="pass">0</span> PASS
+	</div>
+</div>
+<script type="text/javascript">
+	/*** convenience functions ***/
+	function getTime() { return new Date().getTime(); }
+	function $(id) { return document.getElementById(id); }
+	
+	//the currently assigned problem
+	var problem = {
+		num1: 2,
+		op: "+",
+		num2: 2,
+		
+		answer: 4,
+		
+		toString: function() { 
+			return this.num1+this.op+this.num2;
+		}
+	}
+	var numPass = 0;
+	var numFail = 0;
+	var timePer = 5;
+	
+	function makeProblem() {
+		problem.num1 = Math.ceil(Math.random()*10);
+		problem.num2 = Math.ceil(Math.random()*10);
+		var add = Math.round(Math.random()) //50-50 chance
+		if(add) {
+			problem.op = "+";
+			problem.answer = problem.num1+problem.num2;
+		}
+		else {
+			problem.op = "-";
+			problem.answer = problem.num1-problem.num2;
+		}
+		
+		//update the prompt with the new problem
+		$("question").innerHTML = problem.toString();
+		//clear the prompt input
+		$("answer").value = "";
+		
+		startTimer();
+	}
+	
+	function failProblem() {
+		numFail += 1;
+		$("fail").innerHTML = numFail;
+		$("fail").classList.add("bumped");
+		setTimeout(function () { $("fail").classList.remove("bumped"); }, 50);
+		makeProblem();
+	}
+	
+	function passProblem() {
+		numPass += 1;
+		$("pass").innerHTML = numPass;
+		$("pass").classList.add("bumped");
+		setTimeout(function () { $("pass").classList.remove("bumped"); }, 50);
+		makeProblem();
+	}
+	
+	var startTime;
+	var endTime;
+	function startTimer() {
+		startTime = getTime();
+		endTime = startTime+(timePer*1000);
+		updateTime();
+	}
+	
+	//adjust timer bar width
+	function updateTime() {
+		//if paused, render a solid grey bar instead
+		if(pauseTime) {
+			$("timer").children[0].setAttribute("style", 
+				"width:100%; " +
+				"background-color:grey");
+			return;
+		}
+		var percentGone = 100*(endTime - getTime())/(endTime - startTime);
+		if(percentGone <= 0) {
+			failProblem()
+		}
+		else
+			$("timer").children[0].setAttribute("style", 
+				"width:"+Math.floor(percentGone)+"%; " +
+				"background-color:red");
+	}
+	
+	$("answer").onkeypress = function(key) {
+		if(key.which === 13) { //if submitting (pressing "enter")
+			if($("answer").value == problem.answer) {
+				passProblem();
+			}
+			else { 
+				numFail += 1;
+				failProblem();
+			}
+		}
+	}
+	
+	//when the game was last paused, or 0 if not paused
+	var pauseTime;
+	
+	function begin() {
+		if(pauseTime) {
+			var timePaused = getTime()-pauseTime;
+			startTime += timePaused;
+			endTime += timePaused;
+			pauseTime = 0;
+			$("question").innerHTML = problem.toString();
+		}
+		else {
+			startTimer();
+			running = setInterval(updateTime, 50);
+		}
+	}
+	
+	function pause() {
+		pauseTime = getTime();
+		$("question").innerHTML = "<strong>*PAUSED*</strong>";
+	
+}</script>
+</body>
+</html>

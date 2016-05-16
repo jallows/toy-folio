@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Inline Block Toy</title>
+	<script src="jquery-2.1.3.js"></script>
+	<!-- decided to throw in client-side templating,
+	see: http://icanhazjs.com/ -->
+    <script src="ICanHaz.js" ></script>
+    <script id="card" type="text/html">
+      <div class="card">
+        <div class="name">{{ name }}</div>
+        <div class="image filler"></div>
+        <div class="rules">{{ rules }}</div>
+      </div>
+    </script>
+	<style type="text/css">
+	body {
+		margin: auto;
+	}
+	#cardzone {
+		min-height: 200px;
+		width: auto;
+		padding: 20px;
+		border: 1px solid black;
+		border-radius: 10px;
+		background-color: lightgrey;
+	}
+	.card {
+		font-family: sans-serif;
+		font-size: 8pt;
+		display: inline-block;
+		vertical-align: middle;
+		width: 130px;
+		min-height: 150px;
+		border: 5px solid black;
+		border-radius: 5px;
+		background-color: burlywood;
+		padding: 1px;
+		text-align: center;
+		margin: auto 5px;
+	}
+	.card .name {
+		font-size: 1.2em;
+		font-weight: bold;
+		text-align: center;
+	}
+	.card .image.filler {
+		width: 120px;
+		height: 120px;
+		margin: 0 auto;
+		background-color: rgba(0, 0, 0, 0.5);
+		border: 1px solid rgb(29, 29, 29);
+	}
+	.card .rules {
+		text-align: left;
+		margin: 4px;
+		padding: 5px;
+		border: 1px solid black;
+		background: rgba(255, 255, 255, 0.5);
+	}
+	</style>
+</head>
+<body>
+<!-- Saw this:
+http://designshack.net/articles/css/whats-the-deal-with-display-inline-block/
+Wanted to play. -->
+<div id="cardzone">
+	<!-- <div class="card">
+	  <span class="name">Super</span>
+	  <div class="image filler"></div>
+	  <span class="rules">Do something.</span>
+	</div> -->
+</div>
+<input type="button" value="+" onclick="addCard()">
+<input type="button" value="++" onclick="addLongCard()">
+<script type="text/javascript">
+	var sillyCard = {
+		name: "Silly card",
+		rules: "I'm a card."
+	}
+	var longCard = {
+		name: "Much longer card",
+		rules: "I'm a card with a much longer text. I can do all kinds of cool things probably. But you'll have to read ALL of the rules text first, which might be a bit tedious. After you know everything I can do though, you should play me. Because I do cool things."
+	}
+	
+	function addCard() {
+		card = ich.card(sillyCard);
+		$("#cardzone").append(card);
+	}
+	
+	function addLongCard() {
+		card = ich.card(longCard);
+		$("#cardzone").append(card);
+	}
+</script>
+</body>
+</html>
