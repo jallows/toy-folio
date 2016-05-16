@@ -2,10 +2,10 @@
 <html>
 <head>
 	<title>Inline Block Toy</title>
-	<script src="jquery-2.1.3.js"></script>
+	<script src="lib/jquery-2.1.3.js"></script>
 	<!-- decided to throw in client-side templating,
 	see: http://icanhazjs.com/ -->
-    <script src="ICanHaz.js" ></script>
+    <script src="lib/ICanHaz.js" ></script>
     <script id="card" type="text/html">
       <div class="card">
         <div class="name">{{ name }}</div>
@@ -82,12 +82,12 @@ Wanted to play. -->
 		name: "Much longer card",
 		rules: "I'm a card with a much longer text. I can do all kinds of cool things probably. But you'll have to read ALL of the rules text first, which might be a bit tedious. After you know everything I can do though, you should play me. Because I do cool things."
 	}
-	
+
 	function addCard() {
 		card = ich.card(sillyCard);
 		$("#cardzone").append(card);
 	}
-	
+
 	function addLongCard() {
 		card = ich.card(longCard);
 		$("#cardzone").append(card);
